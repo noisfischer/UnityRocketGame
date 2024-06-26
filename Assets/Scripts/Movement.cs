@@ -6,14 +6,18 @@ using UnityEngine.UIElements;
 public class Movement : MonoBehaviour
 {
     Rigidbody rocketRigidBody;
-
+    AudioSource rocketAudio;
+    [SerializeField] ParticleSystem mainThrusterParticles;
+    [SerializeField] ParticleSystem leftThrusterParticles;
+    [SerializeField] ParticleSystem rightThrusterParticles;
     [SerializeField] float mainThrust = 1000.0f;
-
     [SerializeField] float rotationRate = 1000.0f;
+    [SerializeField] AudioClip thrusterAudio;
 
     void Start()
     {
         rocketRigidBody = GetComponent<Rigidbody>(); // cache ref to rigidbody component
+        rocketAudio = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -27,6 +31,20 @@ public class Movement : MonoBehaviour
         if(Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
             rocketRigidBody.AddRelativeForce((Vector3.up  * mainThrust) * Time.deltaTime);
+            if(!rocketAudio.isPlaying)
+            {
+                rocketAudio.PlayOneShot(thrusterAudio);
+            }
+
+            if(mainThrusterParticles.isStopped)
+            {
+                mainThrusterParticles.Play();
+            }
+        }
+        else
+        {
+            rocketAudio.Stop();
+            mainThrusterParticles.Stop();
         }
     }
 
@@ -35,10 +53,27 @@ public class Movement : MonoBehaviour
         if(Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             ApplyRotation(rotationRate);
+            if(leftThrusterParticles.isStopped)
+            {
+                leftThrusterParticles.Play();
+            }
         }
-        else if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
+        else
+        {
+            leftThrusterParticles.Stop();
+        }
+
+        if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
             ApplyRotation(-rotationRate);
+            if(rightThrusterParticles.isStopped)
+            {
+                rightThrusterParticles.Play();
+            }
+        }
+        else
+        {
+            rightThrusterParticles.Stop();
         }
     }
 
