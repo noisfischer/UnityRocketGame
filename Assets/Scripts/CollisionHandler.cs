@@ -10,16 +10,55 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] AudioClip successAudio;
     [SerializeField] ParticleSystem successParticles;
     [SerializeField] ParticleSystem crashParticles;
-    bool transitioning = false;
-
+    bool bTransitioning = false;
+    bool bGodMode = false;
     void Start()
     {
         rocketAudio = GetComponent<AudioSource>();
+        bGodMode = false;
+    }
+
+    void Update()
+    {
+        RespondToDebugKeys();
+    }
+
+    void RespondToDebugKeys()
+    {
+        if (Input.GetKey(KeyCode.L))
+        {
+            if (SceneManager.GetActiveScene().buildIndex <= SceneManager.loadedSceneCount)
+            {
+                NextLevel();
+            }
+            else
+            {
+                RestartGame();
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            if(bGodMode == false)
+            {
+                bGodMode = true;
+                Debug.Log("God Mode Activated");
+            }
+            else
+            {
+                bGodMode = false;
+                Debug.Log("God Mode Deactivated");
+            }
+            
+        }
+        else if (Input.GetKey(KeyCode.R))
+        {
+            LoadLevel(0);
+        }
     }
 
     void OnCollisionEnter(Collision other)
     {
-        if(transitioning) {return;}
+        if(bTransitioning || bGodMode) {return;}
 
         switch(other.gameObject.tag)
         {
@@ -29,7 +68,7 @@ public class CollisionHandler : MonoBehaviour
             }
             case "Finish":
             {
-                transitioning = true;
+                bTransitioning = true;
                 rocketAudio.Stop();
                 rocketAudio.PlayOneShot(successAudio);
                 successParticles.Play();
@@ -39,7 +78,7 @@ public class CollisionHandler : MonoBehaviour
             }
             case "Final Level":
             {
-                transitioning = true;
+                bTransitioning = true;
                 rocketAudio.Stop();
                 rocketAudio.PlayOneShot(successAudio);
                 successParticles.Play();
@@ -48,7 +87,7 @@ public class CollisionHandler : MonoBehaviour
                 break;
             }
             default:
-                transitioning = true;
+                bTransitioning = true;
                 rocketAudio.Stop();
                 rocketAudio.PlayOneShot(crashAudio);
                 crashParticles.Play();
@@ -60,19 +99,16 @@ public class CollisionHandler : MonoBehaviour
 
     void StartCrashSequence()
     {
-        // particles
         LoadLevel(0); // restart current level
     }
 
     void NextLevel()
     {
-        // particles
         LoadLevel(1);
     }
 
     void RestartGame()
     {
-        // particles
         LoadLevel(-SceneManager.GetActiveScene().buildIndex);
     }
 

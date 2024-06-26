@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UIElements;
 
 public class Movement : MonoBehaviour
@@ -30,16 +31,7 @@ public class Movement : MonoBehaviour
     {
         if(Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
-            rocketRigidBody.AddRelativeForce((Vector3.up  * mainThrust) * Time.deltaTime);
-            if(!rocketAudio.isPlaying)
-            {
-                rocketAudio.PlayOneShot(thrusterAudio);
-            }
-
-            if(mainThrusterParticles.isStopped)
-            {
-                mainThrusterParticles.Play();
-            }
+            StartThrust();
         }
         else
         {
@@ -48,25 +40,32 @@ public class Movement : MonoBehaviour
         }
     }
 
-    void ProcessRotation()
+    void StartThrust()
     {
-        if(Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
+        rocketRigidBody.AddRelativeForce((Vector3.up * mainThrust) * Time.deltaTime);
+        if (!rocketAudio.isPlaying)
         {
-            ApplyRotation(rotationRate);
-            if(leftThrusterParticles.isStopped)
-            {
-                leftThrusterParticles.Play();
-            }
-        }
-        else
-        {
-            leftThrusterParticles.Stop();
+            rocketAudio.PlayOneShot(thrusterAudio);
         }
 
-        if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
+        if (mainThrusterParticles.isStopped)
+        {
+            mainThrusterParticles.Play();
+        }
+    }
+
+    void ProcessRotation()
+    {
+        RotateLeft();
+        RotateRight();
+    }
+
+    void RotateRight()
+    {
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
             ApplyRotation(-rotationRate);
-            if(rightThrusterParticles.isStopped)
+            if (rightThrusterParticles.isStopped)
             {
                 rightThrusterParticles.Play();
             }
@@ -74,6 +73,22 @@ public class Movement : MonoBehaviour
         else
         {
             rightThrusterParticles.Stop();
+        }
+    }
+
+    void RotateLeft()
+    {
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
+        {
+            ApplyRotation(rotationRate);
+            if (leftThrusterParticles.isStopped)
+            {
+                leftThrusterParticles.Play();
+            }
+        }
+        else
+        {
+            leftThrusterParticles.Stop();
         }
     }
 
